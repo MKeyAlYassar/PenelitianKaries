@@ -3,25 +3,18 @@ import json
 from helper_function import rle_to_mask
 import os
 import glob
-import cv2
 import segmentation_models as sm
 
 import numpy as np
 import cv2
-import tensorflow as tf
-import sklearn
 from tensorflow.keras.layers import *
-from tensorflow.keras import models
 from tensorflow.keras.callbacks import *
-from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
-from tensorflow.keras.metrics import MeanIoU
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
 
 tf.config.run_functions_eagerly(True)
 tf.data.experimental.enable_debug_mode()
-# np.set_printoptions(threshold=sys.maxsize)
 
 # Set GPU Memory Growth
 gpus = tf.config.experimental.list_physical_devices('GPU')

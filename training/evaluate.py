@@ -4,8 +4,6 @@ import glob
 import cv2
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import load_model
-from tensorflow.keras.metrics import MeanIoU
 from sklearn.model_selection import train_test_split
 import segmentation_models as sm
 from helper_function import rle_to_mask

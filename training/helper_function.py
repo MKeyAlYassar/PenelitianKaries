@@ -1,7 +1,6 @@
 from typing import List
 import numpy as np
-import json
-from PIL import Image
+
 class InputStream:
     def __init__(self, data):
         self.data = data

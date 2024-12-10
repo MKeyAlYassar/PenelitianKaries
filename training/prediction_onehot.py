@@ -5,8 +5,6 @@ import cv2
 import random
 import matplotlib.pyplot as plt
 import segmentation_models as sm
-import sys
-# np.set_printoptions(threshold=sys.maxsize)
 
 # Load the saved model
 model = tf.keras.models.load_model('h5_models/checkpoints/unet_resnet50/epoch_100.h5', compile=False)
@@ -45,14 +43,6 @@ train_images = preprocess_input(karies_images)
 # Predict masks for all images in the Karies folder
 predicted_masks = model.predict(karies_images)
 binary_masks = np.argmax(predicted_masks, axis=-1)
-
-# for mask in binary_masks:
-#     print(np.unique(mask))
-# print(binary_masks[-1])
-# print(np.unique(binary_masks[-1]))
-
-# print(predicted_masks.shape)
-# print(predicted_masks[32])
 
 def apply_mask_on_image(image, mask):
     mask = (mask * 255).astype(np.uint8)  # Scale to 0-255
