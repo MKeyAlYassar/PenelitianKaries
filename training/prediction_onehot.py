@@ -9,10 +9,10 @@ import sys
 # np.set_printoptions(threshold=sys.maxsize)
 
 # Load the saved model
-model = tf.keras.models.load_model('h5_models/unet_vgg19_jaccard_100_augment.h5', compile=False)
+model = tf.keras.models.load_model('h5_models/checkpoints/unet_vgg19/unet_vgg19_epoch_100.h5', compile=False)
 
 # Directory for the Karies folder
-karies_folder = "../dataset_660/Karies"
+karies_folder = "../dataset_lengkap/Karies"
 
 # Load all the images from the Karies folder and resize them
 def load_images_from_folder(folder, img_size=(224, 224)):
@@ -71,7 +71,7 @@ def display_random_predictions_loop(images, predicted_masks, num_examples=3):
             # Randomly pick `num_examples` indices
             indices = random.sample(range(len(images)), num_examples)
 
-            plt.figure(figsize=(4, num_examples * 2))  # Adjust size for better display
+            plt.figure(figsize=(6, num_examples * 2))  # Adjust size for better display
 
             for i, idx in enumerate(indices):
                 # Plot the real image

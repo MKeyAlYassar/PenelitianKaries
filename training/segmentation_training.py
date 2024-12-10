@@ -17,6 +17,7 @@ from sklearn.utils import shuffle
 import matplotlib.pyplot as plt
 from tensorflow.keras.metrics import MeanIoU
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.optimizers import Adam
 
 import sys
 
@@ -51,11 +52,14 @@ def process_json_one_hot(file_paths):
             original_height = 224
 
             # Convert RLE to mask (binary mask with values 0 and 1)
-            mask = rle_to_mask(
-                rle,
-                original_width,
-                original_height
-            )
+            try:
+                mask = rle_to_mask(
+                    rle,
+                    original_width,
+                    original_height
+                )
+            except ValueError:
+                continue
 
             # Convert binary mask to one-hot encoding
             # Assuming two classes: background (0) and foreground (1)
@@ -68,13 +72,20 @@ def process_json_one_hot(file_paths):
     return masks
 
 
-file_paths = ["../labeling/project-1-at-2024-11-15-11-14-9ed6a173.json",
+file_paths = [
               "../labeling/1-100.json",
-              "../labeling/101-200.json"]
+              "../labeling/101-200.json",
+              "../labeling/resmi_menamatkan_gambar.json",
+              "../labeling/project-1-at-2024-12-10-15-09-d3d41871.json",
+              "../labeling/project-1-at-2024-12-10-15-09-46e9d17f.json",
+              "../labeling/project-1-at-2024-12-07-14-44-e1dc025b.json",
+              "../labeling/project-3-at-2024-12-10-15-23-68e63351.json",
+              "../labeling/project-3-at-2024-12-07-15-20-00f9eaeb.json"
+              ]
 
 masks = process_json_one_hot(file_paths)
 
-dataset_path = "../dataset_660"
+dataset_path = "../dataset_lengkap"
 
 train_images = []
 
@@ -92,27 +103,42 @@ for subfolder_name in ["Normal", "Karies"]:
         temp["image"] = img
         train_images.append(temp)
 
+print(f"Banyak Dataset: {len(train_images)}")
+print(f"Banyak Label: {len(masks)}")
 
 def combine_images_and_masks(train_images, masks):
     combined_list = []
+    seen_paths = set()  # Keep track of processed image paths
+    duplicate_count = 0  # Counter for duplicates
 
     for img_dict in train_images:
         # Find the corresponding mask dictionary where image_path matches
+        matched = False
         for mask_dict in masks:
             if img_dict["image_path"] == mask_dict["image_path"]:
-                # Combine the two dictionaries
-                combined_dict = {
-                    "image_path": img_dict["image_path"],
-                    "image": img_dict["image"],
-                    "mask": mask_dict["mask"]
-                }
-                combined_list.append(combined_dict)
-                break  # No need to continue searching once matched
+                if img_dict["image_path"] in seen_paths:
+                    # print(f"Warning: Duplicate detected for image_path '{img_dict['image_path']}'")
+                    duplicate_count += 1
+                else:
+                    # Combine the two dictionaries
+                    combined_dict = {
+                        "image_path": img_dict["image_path"],
+                        "image": img_dict["image"],
+                        "mask": mask_dict["mask"]
+                    }
+                    combined_list.append(combined_dict)
+                    seen_paths.add(img_dict["image_path"])
+                matched = True
+                break
+        # if not matched:
+        #     print(f"Warning: No matching mask found for image_path '{img_dict['image_path']}'")
 
+    print(f"Total duplicates detected: {duplicate_count}")
     return combined_list
 
 
 combined_list = combine_images_and_masks(train_images, masks)
+print(f"Banyak Combined List: {len(combined_list)}")
 
 def separate_images_and_masks(combined_list):
     train_images = []
@@ -130,13 +156,16 @@ images, masks = separate_images_and_masks(combined_list)
 images = np.array(images).astype('float32')
 masks = np.array(masks).astype('float32')
 
+print("All Images", images.shape)
+print("All Masks:", masks.shape)
+
 train_images, temp_images, train_masks, temp_masks = train_test_split(images, masks, test_size=0.3, random_state=42)
 val_images, test_images, val_masks, test_masks = train_test_split(temp_images, temp_masks, test_size=0.5, random_state=42)
 
-# Augment Training Images
-from augment_functions import horizontal_flip
-
-train_images, train_masks = horizontal_flip(train_images, train_masks)
+# # Augment Training Images
+# from augment_functions import horizontal_flip
+#
+# train_images, train_masks = horizontal_flip(train_images, train_masks)
 
 # Check Data Shape
 print("Train Images", train_images.shape)
@@ -147,34 +176,46 @@ print("Test Images", test_images.shape)
 print("Test Masks:", test_masks.shape)
 
 # Initialize Backbone
-BACKBONE = 'resnet152'
+BACKBONE = 'resnet50'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 
-# preprocess input
+# Preprocess input
 train_images = preprocess_input(train_images)
 val_images = preprocess_input(val_images)
 
-# define model
+# Define model
 model = sm.Unet(BACKBONE, classes=2, encoder_weights='imagenet', activation='softmax')
 model.compile(
-    'Adam',
+    optimizer=Adam(learning_rate=0.0001),
     loss=sm.losses.bce_jaccard_loss,
     metrics=[sm.metrics.iou_score],
 )
-EPOCHS = 100
-# fit model
-history = model.fit(
-   x=train_images,
-   y=train_masks,
-   batch_size=8,
-   epochs=100,
-   validation_data=(val_images, val_masks),
+
+# Directory to save the model checkpoints
+checkpoint_dir = 'h5_models/checkpoints'
+
+# Callback to save the model every 10 epochs
+checkpoint_callback = ModelCheckpoint(
+    filepath=os.path.join(checkpoint_dir, f'unet_{BACKBONE}_epoch_{{epoch:02d}}.h5'),
+    save_freq='epoch',
+    save_best_only=False,  # Save every 10 epochs, not just the best model
+    period=10  # Save every 10 epochs
 )
 
-# Save the model
-model.save(f'h5_models/unet_{BACKBONE}_jaccard_{EPOCHS}_augment.h5')
+# Training parameters
+EPOCHS = 100
 
-print("training_finish")
+# Fit model with the callback
+history = model.fit(
+    x=train_images,
+    y=train_masks,
+    batch_size=8,
+    epochs=EPOCHS,
+    validation_data=(val_images, val_masks),
+    callbacks=[checkpoint_callback],
+)
+
+print("Training Finished")
 
 def plot_training_history(history):
     """
