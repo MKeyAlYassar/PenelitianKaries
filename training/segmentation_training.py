@@ -19,8 +19,6 @@ from tensorflow.keras.metrics import MeanIoU
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import Adam
 
-import sys
-
 tf.config.run_functions_eagerly(True)
 tf.data.experimental.enable_debug_mode()
 # np.set_printoptions(threshold=sys.maxsize)
@@ -192,13 +190,16 @@ model.compile(
 )
 
 # Directory to save the model checkpoints
-checkpoint_dir = 'h5_models/checkpoints'
+if not os.path.exists(f"h5_models/checkpoints/unet_{BACKBONE}"):
+        os.makedirs(f"h5_models/checkpoints/unet_{BACKBONE}")
+
+checkpoint_dir = f'h5_models/checkpoints/unet_{BACKBONE}'
 
 # Callback to save the model every 10 epochs
 checkpoint_callback = ModelCheckpoint(
-    filepath=os.path.join(checkpoint_dir, f'unet_{BACKBONE}_epoch_{{epoch:02d}}.h5'),
+    filepath=os.path.join(checkpoint_dir, f'epoch_{{epoch:02d}}.h5'),
     save_freq='epoch',
-    save_best_only=False,  # Save every 10 epochs, not just the best model
+    save_best_only=False,
     period=10  # Save every 10 epochs
 )
 
@@ -237,8 +238,8 @@ def plot_training_history(history):
     plt.plot(history.history['iou_score'], label='Training IoU')
     plt.plot(history.history['val_iou_score'], label='Validation IoU')
     plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.title('Accuracy Over Epochs')
+    plt.ylabel('IoU')
+    plt.title('IoU Over Epochs')
     plt.legend()
 
     plt.tight_layout()

@@ -9,7 +9,7 @@ import sys
 # np.set_printoptions(threshold=sys.maxsize)
 
 # Load the saved model
-model = tf.keras.models.load_model('h5_models/checkpoints/unet_vgg19/unet_vgg19_epoch_100.h5', compile=False)
+model = tf.keras.models.load_model('h5_models/checkpoints/unet_resnet50/epoch_100.h5', compile=False)
 
 # Directory for the Karies folder
 karies_folder = "../dataset_lengkap/Karies"
