@@ -1,0 +1,38 @@
+Salah Shape:
+Image at path '../../dataset_lengkap\Normal\108 (4).jpg' has an unexpected shape: (208, 224, 3)
+Image at path '../../dataset_lengkap\Normal\153 (5).jpg' has an unexpected shape: (224, 223, 3)
+Image at path '../../dataset_lengkap\Normal\156 (2).jpg' has an unexpected shape: (166, 224, 3)
+Image at path '../../dataset_lengkap\Normal\156 (3).jpg' has an unexpected shape: (217, 224, 3)
+Image at path '../../dataset_lengkap\Karies\107 (1).jpg' has an unexpected shape: (223, 224, 3)
+Image at path '../../dataset_lengkap\Karies\128 (1).jpg' has an unexpected shape: (222, 224, 3)
+Image at path '../../dataset_lengkap\Karies\157 (1).jpg' has an unexpected shape: (224, 222, 3)
+
+
+Duplikat:
+Warning: Duplicate detected for image_path '220_1.jpg'
+Warning: Duplicate detected for image_path '220_3.jpg'
+Warning: Duplicate detected for image_path '220_4.jpg'
+Warning: Duplicate detected for image_path '220_5.jpg'
+Warning: Duplicate detected for image_path '221_1.jpg'
+Warning: Duplicate detected for image_path '221_3.jpg'
+Warning: Duplicate detected for image_path '221_4.jpg'
+Warning: Duplicate detected for image_path '221_5.jpg'
+Warning: Duplicate detected for image_path '222_1.jpg'
+Warning: Duplicate detected for image_path '222_3.jpg'
+Warning: Duplicate detected for image_path '222_5.jpg'
+Warning: Duplicate detected for image_path '223_1.jpg'
+Warning: Duplicate detected for image_path '223_2.jpg'
+Warning: Duplicate detected for image_path '223_3.jpg'
+Warning: Duplicate detected for image_path '223_4.jpg'
+Warning: Duplicate detected for image_path '223_5.jpg'
+Warning: Duplicate detected for image_path '224_3.jpg'
+Warning: Duplicate detected for image_path '224_4.jpg'
+Warning: Duplicate detected for image_path '224_5.jpg'
+Warning: Duplicate detected for image_path '225_1.jpg'
+Warning: Duplicate detected for image_path '225_3.jpg'
+Warning: Duplicate detected for image_path '225_4.jpg'
+Warning: Duplicate detected for image_path '225_5.jpg'
+Warning: Duplicate detected for image_path '226_3.jpg'
+Warning: Duplicate detected for image_path '226_5.jpg'
+Warning: Duplicate detected for image_path '240_3.jpg'
+Total duplicates detected: 26
