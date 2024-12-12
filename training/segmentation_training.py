@@ -4,7 +4,7 @@ from helper_function import rle_to_mask
 import os
 import glob
 import segmentation_models as sm
-
+import tensorflow as tf
 import numpy as np
 import cv2
 from tensorflow.keras.layers import *
@@ -167,7 +167,7 @@ print("Test Images", test_images.shape)
 print("Test Masks:", test_masks.shape)
 
 # Initialize Backbone
-BACKBONE = 'resnet50'
+BACKBONE = 'mobilenetv2'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 
 # Preprocess input
