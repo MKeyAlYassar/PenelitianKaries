@@ -41,14 +41,14 @@ def process_json_one_hot(file_paths):
 
 # File paths for the JSON files
 file_paths = [
-    "../labeling/1-100.json",
-    "../labeling/101-200.json",
-    "../labeling/resmi_menamatkan_gambar.json",
-    "../labeling/project-1-at-2024-12-10-15-09-d3d41871.json",
-    "../labeling/project-1-at-2024-12-10-15-09-46e9d17f.json",
-    "../labeling/project-1-at-2024-12-07-14-44-e1dc025b.json",
-    "../labeling/project-3-at-2024-12-10-15-23-68e63351.json",
-    "../labeling/project-3-at-2024-12-07-15-20-00f9eaeb.json"
+    "../labeling/1-100.json", # Adit
+    "../labeling/101-200.json", # Adit
+    "../labeling/adit_karies_revised.json",
+    "../labeling/project-1-at-2024-12-10-15-09-d3d41871.json", # Suhel
+    "../labeling/project-1-at-2024-12-10-15-09-46e9d17f.json", # Mikrajuz
+    "../labeling/key_karies_1_revised.json",
+    "../labeling/project-3-at-2024-12-10-15-23-68e63351.json", # Ikhwan
+    "../labeling/key_karies_2_revised.json"
 ]
 masks = process_json_one_hot(file_paths)
 
@@ -106,14 +106,14 @@ val_images, test_images, val_masks, test_masks = train_test_split(
     temp_images, temp_masks, test_size=0.5, random_state=42)
 
 # Preprocess input
-BACKBONE = 'resnet50'
+BACKBONE = 'mobilenetv2'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 train_images = preprocess_input(train_images)
 val_images = preprocess_input(val_images)
 test_images = preprocess_input(test_images)
 
 # Load the trained model
-model = tf.keras.models.load_model('h5_models/checkpoints/unet_resnet50/epoch_100.h5', compile=False)
+model = tf.keras.models.load_model(f'h5_models/checkpoints/unet_{BACKBONE}/epoch_100.h5', compile=False)
 
 # Evaluate predictions
 # Function to calculate Jaccard loss

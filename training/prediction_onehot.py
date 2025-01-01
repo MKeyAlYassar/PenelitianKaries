@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import segmentation_models as sm
 
 # Load the saved model
-model = tf.keras.models.load_model('h5_models/checkpoints/unet_resnet50/epoch_100.h5', compile=False)
+BACKBONE = 'vgg19'
+model = tf.keras.models.load_model(f'h5_models/checkpoints/unet_{BACKBONE}/epoch_100.h5', compile=False)
 
 # Directory for the Karies folder
 karies_folder = "../dataset_lengkap/Karies"
@@ -23,7 +24,6 @@ def load_images_from_folder(folder, img_size=(224, 224)):
             img = cv2.imread(img_path, cv2.IMREAD_COLOR)
             if img is not None:
                 img = cv2.resize(img, img_size)
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB for correct color display
                 images.append(img)
                 image_paths.append(img_path)
 
@@ -34,14 +34,13 @@ def load_images_from_folder(folder, img_size=(224, 224)):
 karies_images, image_paths = load_images_from_folder(karies_folder)
 karies_images = np.array(karies_images)
 
-BACKBONE = 'vgg19'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 
 # preprocess input
 train_images = preprocess_input(karies_images)
 
 # Predict masks for all images in the Karies folder
-predicted_masks = model.predict(karies_images)
+predicted_masks = model.predict(train_images)
 binary_masks = np.argmax(predicted_masks, axis=-1)
 
 def apply_mask_on_image(image, mask):
@@ -64,6 +63,9 @@ def display_random_predictions_loop(images, predicted_masks, num_examples=3):
             plt.figure(figsize=(6, num_examples * 2))  # Adjust size for better display
 
             for i, idx in enumerate(indices):
+                # Convert to RGB for plotting
+                images[idx] = cv2.cvtColor(images[idx], cv2.COLOR_BGR2RGB)
+
                 # Plot the real image
                 plt.subplot(num_examples, 3, i * 3 + 1)
                 plt.imshow(images[idx])

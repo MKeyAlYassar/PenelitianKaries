@@ -9,17 +9,17 @@ import segmentation_models as sm
 import tensorflow as tf
 
 # Load the saved model
-model = tf.keras.models.load_model('h5_models/checkpoints/unet_resnet50/epoch_100.h5', compile=False)
-BACKBONE = "resnet50"
+BACKBONE = "vgg19"
+model = tf.keras.models.load_model(f'h5_models/checkpoints/unet_{BACKBONE}/epoch_100.h5', compile=False)
 
 # Specify image paths to plot
 image_paths_to_plot = [
-    "124_4.jpg",
-    "056_1.jpg",
-    "245_2.jpg"
-    # "001_2.jpg",
-    # "001_3.jpg",
-    # "001_4.jpg"
+    # "124_4.jpg",
+    # "056_1.jpg",
+    # "245_2.jpg"
+    "001_2.jpg",
+    "001_3.jpg",
+    "001_4.jpg"
 ]
 
 def process_json_one_hot(file_paths):
@@ -139,14 +139,14 @@ def plot_results_by_paths(data, image_paths):
         print(f"Warning: The following image paths were not found in the dataset: {missing_paths}")
 
 file_paths = [
-    "../labeling/1-100.json",
-    "../labeling/101-200.json",
-    "../labeling/resmi_menamatkan_gambar.json",
-    "../labeling/project-1-at-2024-12-10-15-09-d3d41871.json",
-    "../labeling/project-1-at-2024-12-10-15-09-46e9d17f.json",
-    "../labeling/project-1-at-2024-12-07-14-44-e1dc025b.json",
-    "../labeling/project-3-at-2024-12-10-15-23-68e63351.json",
-    "../labeling/project-3-at-2024-12-07-15-20-00f9eaeb.json"
+    "../labeling/1-100.json", # Adit
+    "../labeling/101-200.json", # Adit
+    "../labeling/adit_karies_revised.json",
+    "../labeling/project-1-at-2024-12-10-15-09-d3d41871.json", # Suhel
+    "../labeling/project-1-at-2024-12-10-15-09-46e9d17f.json", # Mikrajuz
+    "../labeling/key_karies_1_revised.json",
+    "../labeling/project-3-at-2024-12-10-15-23-68e63351.json", # Ikhwan
+    "../labeling/key_karies_2_revised.json"
 ]
 
 dataset_path = "../dataset_lengkap"
