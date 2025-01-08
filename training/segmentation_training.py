@@ -1,6 +1,6 @@
 import json
 
-from helper_function import rle_to_mask
+from helper.helper_function import rle_to_mask
 import os
 import glob
 import segmentation_models as sm
@@ -154,7 +154,7 @@ train_images, temp_images, train_masks, temp_masks = train_test_split(images, ma
 val_images, test_images, val_masks, test_masks = train_test_split(temp_images, temp_masks, test_size=0.5, random_state=42)
 
 # # Augment Training Images
-# from augment_functions import horizontal_flip
+# from helper.augment_functions import horizontal_flip
 #
 # train_images, train_masks = horizontal_flip(train_images, train_masks)
 
