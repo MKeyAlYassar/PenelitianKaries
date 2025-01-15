@@ -22,20 +22,20 @@ if gpus:
 
 # Hyperparameter configurations
 hyperparams = [
-    {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
-    {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "resnet50", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    #
+    # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    #
+    # {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
 
-    {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
-    {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "resnet50", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
 
-    {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
-    {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "resnet50", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
-
-    {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
-    {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "resnet50", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
-
-    {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
-    {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "resnet50", "LEARNING_RATE": 0.0003, "OPTIMIZER": "SGD"},
+    {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
 ]
 
 # Dataset loading and preprocessing
@@ -64,14 +64,6 @@ def load_and_preprocess_data(DATASET_PATH, SEGMENT_BACKBONE, preprocess_input):
     val_images = preprocess_input(val_images)
     test_images = preprocess_input(test_images)
 
-    # Check Data Shape
-    print("Train Images:", train_images.shape)
-    print("Train Labels:", train_labels.shape)
-    print("Validation Images:", val_images.shape)
-    print("Validation Labels:", val_labels.shape)
-    print("Test Images:", test_images.shape)
-    print("Test Labels:", test_labels.shape)
-
     return train_images, train_labels, val_images, val_labels, test_images, test_labels
 
 # Augment Training Images
@@ -85,6 +77,19 @@ def augment_data(train_images, train_labels):
 def plot_training_history(history, save_path):
     plt.figure(figsize=(12, 5))
 
+    # Get consistent Y-axis limits for loss and accuracy
+    max_loss = max(max(history.history['loss']), max(history.history['val_loss']))
+    min_loss = min(min(history.history['loss']), min(history.history['val_loss']))
+    max_acc = max(max(history.history['accuracy']), max(history.history['val_accuracy']))
+    min_acc = min(min(history.history['accuracy']), min(history.history['val_accuracy']))
+
+    # Add some padding to the limits for better visualization
+    loss_padding = (max_loss - min_loss) * 0.1
+    acc_padding = (max_acc - min_acc) * 0.1
+
+    loss_ylim = (min_loss - loss_padding, max_loss + loss_padding)
+    acc_ylim = (min_acc - acc_padding, max_acc + acc_padding)
+
     # Plot Loss
     plt.subplot(1, 2, 1)
     plt.plot(history.history['loss'], label='Training Loss')
@@ -92,6 +97,7 @@ def plot_training_history(history, save_path):
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.title('Loss Over Epochs')
+    plt.ylim(loss_ylim)  # Set consistent Y-axis limits for loss
     plt.legend()
 
     # Plot Accuracy
@@ -101,6 +107,7 @@ def plot_training_history(history, save_path):
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.title('Accuracy Over Epochs')
+    plt.ylim(acc_ylim)  # Set consistent Y-axis limits for accuracy
     plt.legend()
 
     plt.tight_layout()
@@ -123,6 +130,14 @@ for config in hyperparams:
     model_base, preprocess_input = Classifiers.get(BACKBONE)
     train_images, train_labels, val_images, val_labels, test_images, test_labels = load_and_preprocess_data(DATASET_PATH, SEGMENT_BACKBONE, preprocess_input)
     train_images, train_labels = augment_data(train_images, train_labels)
+
+    # Check Data Shape
+    print("Train Images:", train_images.shape)
+    print("Train Labels:", train_labels.shape)
+    print("Validation Images:", val_images.shape)
+    print("Validation Labels:", val_labels.shape)
+    print("Test Images:", test_images.shape)
+    print("Test Labels:", test_labels.shape)
 
     if OPTIMIZER_NAME == "SGD":
         optimizer = SGD(learning_rate=LEARNING_RATE)
@@ -147,13 +162,26 @@ for config in hyperparams:
     # Replace dot with underscore in learning rate or use scientific notation
     lr_formatted = f"{LEARNING_RATE:.0e}".replace("-", "neg")  # Scientific notation, e.g., "1e-4" for 0.0001
     model_name = f"{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
+    model_name_val_loss = f"best_val_loss_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
+    model_name_val_acc = f"best_val_acc_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
     plot_name = f"plot/{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.png"
 
-    checkpoint_callback = ModelCheckpoint(
-        filepath=os.path.join(checkpoint_dir, f'best_{model_name}'),
+    # Callback to save the best model based on validation loss
+    checkpoint_callback_loss = ModelCheckpoint(
+        filepath=os.path.join(checkpoint_dir, model_name_val_loss),
         monitor='val_loss',
         mode='min',
         save_best_only=True,
+        verbose=0
+    )
+
+    # Callback to save the best model based on validation accuracy
+    checkpoint_callback_acc = ModelCheckpoint(
+        filepath=os.path.join(checkpoint_dir, model_name_val_acc),
+        monitor='val_accuracy',
+        mode='max',
+        save_best_only=True,
+        verbose=0
     )
 
     # Train Model
@@ -163,13 +191,13 @@ for config in hyperparams:
         batch_size=16,
         epochs=200,
         validation_data=(val_images, val_labels),
-        callbacks=[checkpoint_callback],
+        callbacks=[checkpoint_callback_loss, checkpoint_callback_acc],
     )
 
     # Save final model and plot
     model.save(os.path.join(checkpoint_dir, model_name))
     plot_training_history(history, plot_name)
 
-    # Pause GPU to rest for 15 minutes
-    print(f"Configuration completed: {config}. Pausing GPU for 15 minutes to rest.")
-    time.sleep(15 * 60)  # Pause for 15 minutes
+    # Pause GPU to rest for 5 minutes
+    print(f"Configuration completed: {config}. Pausing GPU for 5 minutes to rest.")
+    time.sleep(5 * 60)  # Pause for 15 minutes
