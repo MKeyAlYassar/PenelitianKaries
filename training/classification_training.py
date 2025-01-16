@@ -22,20 +22,20 @@ if gpus:
 
 # Hyperparameter configurations
 hyperparams = [
-    # {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    # {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    #
+    {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+
     # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
     # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
     #
     # {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
     # {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-
+    #
     # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
     # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
 
-    {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
 ]
 
 # Dataset loading and preprocessing
@@ -160,11 +160,10 @@ for config in hyperparams:
     os.makedirs(checkpoint_dir, exist_ok=True)
 
     # Replace dot with underscore in learning rate or use scientific notation
-    lr_formatted = f"{LEARNING_RATE:.0e}".replace("-", "neg")  # Scientific notation, e.g., "1e-4" for 0.0001
-    model_name = f"{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
-    model_name_val_loss = f"best_val_loss_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
-    model_name_val_acc = f"best_val_acc_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
-    plot_name = f"plot/{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.png"
+    lr_formatted = f"{LEARNING_RATE:.0e}".replace("-", "neg")  # Scientific notation, e.g., "1eneg4" for 0.0001
+    model_name = f"300_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
+    model_name_val_loss = f"300_best_val_loss_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
+    plot_name = f"plot/300_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.png"
 
     # Callback to save the best model based on validation loss
     checkpoint_callback_loss = ModelCheckpoint(
@@ -175,23 +174,14 @@ for config in hyperparams:
         verbose=0
     )
 
-    # Callback to save the best model based on validation accuracy
-    checkpoint_callback_acc = ModelCheckpoint(
-        filepath=os.path.join(checkpoint_dir, model_name_val_acc),
-        monitor='val_accuracy',
-        mode='max',
-        save_best_only=True,
-        verbose=0
-    )
-
     # Train Model
     history = model.fit(
         x=train_images,
         y=train_labels,
         batch_size=16,
-        epochs=200,
+        epochs=300,
         validation_data=(val_images, val_labels),
-        callbacks=[checkpoint_callback_loss, checkpoint_callback_acc],
+        callbacks=[checkpoint_callback_loss],
     )
 
     # Save final model and plot
