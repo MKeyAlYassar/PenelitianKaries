@@ -22,20 +22,20 @@ if gpus:
 
 # Hyperparameter configurations
 hyperparams = [
-    {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-
-    # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "resnet50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
     #
-    # {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    # {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    #
-    # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "inceptionv3", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
 
-    # {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
-    # {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00001, "OPTIMIZER": "SGD"},
+    {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
+    {"BACKBONE": "mobilenetv2", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
+
+    # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "densenet121", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
+    #
+    # {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "no", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
+    # {"BACKBONE": "resnext50", "SEGMENT_BACKBONE": "vgg19", "LEARNING_RATE": 0.00002, "OPTIMIZER": "SGD"},
 ]
 
 # Dataset loading and preprocessing
@@ -123,9 +123,9 @@ for config in hyperparams:
     OPTIMIZER_NAME = config["OPTIMIZER"]
 
     if SEGMENT_BACKBONE == "no":
-        DATASET_PATH = ["../clean_dataset"]
+        DATASET_PATH = ["../clean_datasetv2"]
     else:
-        DATASET_PATH = [f"../masked_dataset/{SEGMENT_BACKBONE}"]
+        DATASET_PATH = [f"../masked_datasetv2/{SEGMENT_BACKBONE}"]
 
     model_base, preprocess_input = Classifiers.get(BACKBONE)
     train_images, train_labels, val_images, val_labels, test_images, test_labels = load_and_preprocess_data(DATASET_PATH, SEGMENT_BACKBONE, preprocess_input)
@@ -161,9 +161,9 @@ for config in hyperparams:
 
     # Replace dot with underscore in learning rate or use scientific notation
     lr_formatted = f"{LEARNING_RATE:.0e}".replace("-", "neg")  # Scientific notation, e.g., "1eneg4" for 0.0001
-    model_name = f"300_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
-    model_name_val_loss = f"300_best_val_loss_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.h5"
-    plot_name = f"plot/300_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}.png"
+    model_name = f"{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}v2.h5"
+    model_name_val_loss = f"best_val_loss_{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}v2.h5"
+    plot_name = f"plot/{BACKBONE}_{SEGMENT_BACKBONE}_lr{lr_formatted}_{OPTIMIZER_NAME}v2.png"
 
     # Callback to save the best model based on validation loss
     checkpoint_callback_loss = ModelCheckpoint(
@@ -179,7 +179,7 @@ for config in hyperparams:
         x=train_images,
         y=train_labels,
         batch_size=16,
-        epochs=300,
+        epochs=200,
         validation_data=(val_images, val_labels),
         callbacks=[checkpoint_callback_loss],
     )

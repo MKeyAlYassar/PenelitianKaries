@@ -24,13 +24,16 @@ def rotate_180(images, masks=None):
     """
     # Apply 180-degree rotation to all images and masks
     rotated_images = [cv2.rotate(image, cv2.ROTATE_180) for image in images]
-    # rotated_masks = [cv2.rotate(mask, cv2.ROTATE_180) for mask in masks] if masks is not None else None
+    rotated_masks = [cv2.rotate(mask, cv2.ROTATE_180) for mask in masks] if masks is not None else None
 
     # Combine original and rotated data
     augmented_images = np.concatenate((images, rotated_images), axis=0)
-    # augmented_masks = np.concatenate((masks, rotated_masks), axis=0) if masks is not None else None
+    augmented_masks = np.concatenate((masks, rotated_masks), axis=0) if masks is not None else None
 
-    return augmented_images
+    if masks is not None:
+        return augmented_images, augmented_masks
+    elif masks is None:
+        return augmented_images
 
 def plot_augmentation_examples(original_images, original_masks, augmented_images, augmented_masks, num_examples=3):
     """

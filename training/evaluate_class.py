@@ -10,7 +10,7 @@ import glob
 from tabulate import tabulate
 
 # Parameters
-BACKBONES = ["densenet121", "resnet50", "mobilenetv2", "inceptionv3", "resnext50"]  # Add more backbones as needed
+BACKBONES = ["mobilenetv2"]  # Add more backbones as needed
 SEGMENT_BACKBONES = ["no", "vgg19"]  # Add more segmentation backbones as needed
 RANDOM_STATE = 42  # Consistent random state
 
@@ -23,8 +23,8 @@ for backbone in BACKBONES:
         print(f"Processing Backbone: {backbone}, Segmentation Backbone: {seg_backbone}...")
 
         # Paths
-        DATASET_PATH = "../clean_dataset" if seg_backbone == "no" else f"../masked_dataset/{seg_backbone}"
-        MODEL_PATH = f"h5_models/classification/{backbone}/best_val_loss_{backbone}_{seg_backbone}_lr5eneg05_SGD.h5"
+        DATASET_PATH = "../clean_datasetv2" if seg_backbone == "no" else f"../masked_datasetv2/{seg_backbone}"
+        MODEL_PATH = f"h5_models/classification/{backbone}/best_val_loss_{backbone}_{seg_backbone}_lr2eneg05_SGDv2.h5"
 
         # Load pretrained model for preprocessing
         try:

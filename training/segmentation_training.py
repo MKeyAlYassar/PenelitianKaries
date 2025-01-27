@@ -76,7 +76,7 @@ file_paths = [
 
 masks = process_json_one_hot(file_paths)
 
-dataset_path = "../dataset_lengkap"
+dataset_path = "../clean_datasetv2"
 
 train_images = []
 
@@ -153,10 +153,10 @@ print("All Masks:", masks.shape)
 train_images, temp_images, train_masks, temp_masks = train_test_split(images, masks, test_size=0.3, random_state=42)
 val_images, test_images, val_masks, test_masks = train_test_split(temp_images, temp_masks, test_size=0.5, random_state=42)
 
-# # Augment Training Images
-# from helper.augment_functions import horizontal_flip
-#
-# train_images, train_masks = horizontal_flip(train_images, train_masks)
+# Augment Training Images
+from helper.augment_functions import rotate_180
+
+train_images, train_masks = rotate_180(train_images, train_masks)
 
 # Check Data Shape
 print("Train Images", train_images.shape)
@@ -167,7 +167,7 @@ print("Test Images", test_images.shape)
 print("Test Masks:", test_masks.shape)
 
 # Initialize Backbone
-BACKBONE = 'mobilenetv2'
+BACKBONE = 'vgg19'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 
 # Preprocess input
@@ -177,23 +177,23 @@ val_images = preprocess_input(val_images)
 # Define model
 model = sm.Unet(BACKBONE, classes=2, encoder_weights='imagenet', activation='softmax')
 model.compile(
-    optimizer=Adam(learning_rate=0.0001),
+    optimizer=Adam(learning_rate=0.00001),
     loss=sm.losses.bce_jaccard_loss,
     metrics=[sm.metrics.iou_score],
 )
 
 # Directory to save the model checkpoints
-if not os.path.exists(f"h5_models/checkpoints/unet_{BACKBONE}"):
-        os.makedirs(f"h5_models/checkpoints/unet_{BACKBONE}")
+if not os.path.exists(f"h5_models/checkpoints/unet_{BACKBONE}_aug"):
+        os.makedirs(f"h5_models/checkpoints/unet_{BACKBONE}_aug")
 
-checkpoint_dir = f'h5_models/checkpoints/unet_{BACKBONE}'
+checkpoint_dir = f'h5_models/checkpoints/unet_{BACKBONE}_aug'
 
 # Callback to save the model every 10 epochs
 checkpoint_callback = ModelCheckpoint(
-    filepath=os.path.join(checkpoint_dir, f'epoch_{{epoch:02d}}.h5'),
+    filepath=os.path.join(checkpoint_dir, f'epoch_{{epoch:02d}}_lr1eneg5.h5'),
     save_freq='epoch',
     save_best_only=False,
-    period=10  # Save every 10 epochs
+    period=100  # Save every 100 epochs
 )
 
 # Training parameters

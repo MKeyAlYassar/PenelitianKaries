@@ -21,8 +21,8 @@ MODEL_PATH = f"h5_models/checkpoints/unet_{BACKBONE}/epoch_100.h5"
 IMAGE_INPUT_SIZE = (224, 224)
 
 # Paths
-DATASET_PATH = "../augmented_dataset"
-OUTPUT_PATH = f"../augmented_masked_dataset/{BACKBONE}"
+DATASET_PATH = "../clean_datasetv2"
+OUTPUT_PATH = f"../masked_datasetv2/{BACKBONE}"
 
 # Load trained model
 model = tf.keras.models.load_model(f'h5_models/checkpoints/unet_{BACKBONE}/epoch_100.h5', compile=False)

@@ -2,3 +2,13 @@ dataset_660
 dataset_share
 training/h5_models
 mydata
+training/confusion_matrices
+training/plot
+clean_dataset.zip
+augmented_masked_dataset
+augmented_dataset
+clean_dataset
+masked_dataset
+clean_datasetv2.zip
+clean_datasetv2
+dmft_dataset

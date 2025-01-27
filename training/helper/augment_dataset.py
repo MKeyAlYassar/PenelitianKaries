@@ -48,8 +48,8 @@ def augment_and_save_images(dataset_path, output_path):
 
 
 # Paths
-DATASET_PATH = "../../clean_dataset"
-OUTPUT_PATH = "../../augmented_dataset"
+DATASET_PATH = "../../clean_datasetv2"
+OUTPUT_PATH = "../../augmented_datasetv2"
 
 # Run the augmentation and saving process
 augment_and_save_images(DATASET_PATH, OUTPUT_PATH)

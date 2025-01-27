@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 import segmentation_models as sm
-from helper_function import rle_to_mask
+from helper.helper_function import rle_to_mask
 
 # Set GPU Memory Growth
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -53,7 +53,7 @@ file_paths = [
 masks = process_json_one_hot(file_paths)
 
 # Load dataset images
-dataset_path = "../dataset_lengkap"
+dataset_path = "../clean_datasetv2"
 train_images = []
 for subfolder_name in ["Normal", "Karies"]:
     subfolder_path = os.path.join(dataset_path, subfolder_name)
@@ -105,15 +105,20 @@ train_images, temp_images, train_masks, temp_masks = train_test_split(
 val_images, test_images, val_masks, test_masks = train_test_split(
     temp_images, temp_masks, test_size=0.5, random_state=42)
 
+# Augment Training Images
+from helper.augment_functions import rotate_180
+
+train_images, train_masks = rotate_180(train_images, train_masks)
+
 # Preprocess input
-BACKBONE = 'mobilenetv2'
+BACKBONE = 'vgg19'
 preprocess_input = sm.get_preprocessing(BACKBONE)
 train_images = preprocess_input(train_images)
 val_images = preprocess_input(val_images)
 test_images = preprocess_input(test_images)
 
 # Load the trained model
-model = tf.keras.models.load_model(f'h5_models/checkpoints/unet_{BACKBONE}/epoch_100.h5', compile=False)
+model = tf.keras.models.load_model(f'h5_models/checkpoints/unet_{BACKBONE}_aug/epoch_100.h5', compile=False)
 
 # Evaluate predictions
 # Function to calculate Jaccard loss
